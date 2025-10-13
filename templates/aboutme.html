@@ -1,14 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section id="about" class="mb-4">
-    <h2>About Me</h2>
-    <p>Software Developer</p>
+<section id="about" class="mb-5 text-center">
+  <h2>About Me</h2>
+  <p class="lead">Motivated and detail-oriented software developer passionate about backend technologies, Java, and modern web solutions.</p>
 </section>
 
-<section id="education" class="mb-4">
-    <h2>Education</h2>
-    <p>Carpathian National University 2023 - 2027</p>
+<section id="education" class="mb-5">
+  <h2>Education</h2>
+  <ul>
+    <li><strong>Carpathian National University</strong> — Bachelor in Software Engineering (2023–2027)</li>
+  </ul>
+</section>
+
+<section id="technologies" class="mb-5">
+  <h2>Technologies</h2>
+  <div class="tech-list">
+    <span>Java</span>
+    <span>Spring Boot</span>
+    <span>Hibernate</span>
+    <span>MySQL</span>
+    <span>MongoDB</span>
+    <span>Docker</span>
+    <span>Postman</span>
+  </div>
+</section>
+
+<section id="experience" class="mb-5">
+  <h2>Experience</h2>
+  
+  <div class="project">
+    <h4>PNU Dev</h4>
+    <p>Contributed to university software projects, building internal web tools with Java Spring Boot.</p>
+  </div>
+
+  <div class="project">
+    <h4>IT Operations Engineer at Diya</h4>
+    <p>Assisted in maintaining local servers and internal systems. </p>  
+</div>
+</section>
+
+
+<section id="hobbies" class="mb-5">
+  <h2>Hobbies</h2>
+  <p>Gaming, lifting weight, camping</p>
 </section>
 
 {% endblock %}

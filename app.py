@@ -10,5 +10,13 @@ def aboutme():
 def contact():
     return render_template('contact.html', title="Контакти")
 
+@app.route('/services')
+def services():
+    return render_template('services.html', title="Контакти")
+
+@app.route('/projects')
+def projects():
+    return render_template('projects.html', title="Контакти")
+
 if __name__ == '__main__':
     app.run(debug=True)
