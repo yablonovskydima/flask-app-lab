@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 products_bp = Blueprint(
     "products", __name__,
@@ -7,4 +7,5 @@ products_bp = Blueprint(
 
 @products_bp.route("/<product_name>")
 def show_product(product_name):
-    return render_template("products/info.html", product_name=product_name)
+    price = request.args.get("price", 0)
+    return render_template("products/info.html", product_name=product_name, product_price=price)
