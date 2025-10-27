@@ -1,7 +1,53 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Welcome, {{ user }}!</h2>
-<form method="GET" action="{{ url_for('auth.logout') }}">
-    <button type="submit">Logout</button>
+<h2>Welcome, {{ username }}!</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<h3>Add Cookie</h3>
+<form method="POST" action="{{ url_for('auth.profile') }}">
+  <input type="hidden" name="action" value="add">
+  <label>Key:</label>
+  <input type="text" name="key" required>
+  <label>Value:</label>
+  <input type="text" name="value" required>
+  <label>Expires (sec):</label>
+  <input type="number" name="expires" placeholder="optional">
+  <button type="submit">Add</button>
 </form>
+
+<h3>Delete One Cookie</h3>
+<form method="POST" action="{{ url_for('auth.profile') }}">
+  <input type="hidden" name="action" value="delete_one">
+  <label>Key:</label>
+  <input type="text" name="key" required>
+  <button type="submit">Delete</button>
+</form>
+
+<h3>Delete All Cookies</h3>
+<form method="POST" action="{{ url_for('auth.profile') }}">
+  <input type="hidden" name="action" value="delete_all">
+  <button type="submit">Delete All</button>
+</form>
+
+<h3>Current Cookies</h3>
+<table>
+  <tr><th>Key</th><th>Value</th></tr>
+  {% for key, value in cookies %}
+    <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+  {% else %}
+    <tr><td colspan="2">No cookies set</td></tr>
+  {% endfor %}
+</table>
+
+<form method="POST" action="{{ url_for('auth.logout') }}">
+  <button type="submit">Logout</button>
+</form>
+
 {% endblock %}

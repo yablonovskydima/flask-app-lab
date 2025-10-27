@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response
 
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
 
@@ -13,7 +13,7 @@ def login():
         password = request.form.get("password")
 
         if username == VALID_USERNAME and password == VALID_PASSWORD:
-            session["user"] = username
+            session["username"] = username
             flash("Login successful!", "success")
             return redirect(url_for("auth.profile"))
         else:
@@ -23,17 +23,55 @@ def login():
     return render_template("auth/login.html")
 
 
-@auth_bp.route("/profile")
+@auth_bp.route("/profile", methods=["GET", "POST"])
 def profile():
-    user = session.get("user")
-    if not user:
-        flash("Please login to view your profile", "warning")
+    if "username" not in session:
+        flash("Please log in first!", "error")
         return redirect(url_for("auth.login"))
-    return render_template("auth/profile.html", user=user)
+
+    username = session["username"]
+
+    if request.method == "POST":
+        action = request.form.get("action")
+        resp = make_response(redirect(url_for("auth.profile")))
+
+        if action == "add":
+            key = request.form.get("key")
+            value = request.form.get("value")
+            expires_raw = request.form.get("expires", "").strip()
+            expires = int(expires_raw) if expires_raw.isdigit() else None
+
+            if key and value:
+                if expires:
+                    resp.set_cookie(key, value, max_age=expires)
+                else:
+                    resp.set_cookie(key, value)
+                flash(f"Cookie '{key}' added successfully!", "success")
+            else:
+                flash("Please provide both key and value!", "error")
+
+        elif action == "delete_one":
+            key = request.form.get("key")
+            if key:
+                resp.delete_cookie(key)
+                flash(f"Cookie '{key}' deleted successfully!", "success")
+            else:
+                flash("Please provide a cookie key to delete!", "error")
+
+        elif action == "delete_all":
+            for key in request.cookies.keys():
+                resp.delete_cookie(key)
+            flash("All cookies deleted successfully!", "success")
+
+        return resp
+
+    cookies = request.cookies.items()
+    return render_template("auth/profile.html", username=username, cookies=cookies)
 
 
-@auth_bp.route("/logout")
+
+@auth_bp.route("/logout", methods=["POST"])
 def logout():
-    session.pop("user", None)
-    flash("You logged out", "info")
+    session.pop("username", None)
+    flash("You have been logged out!", "info")
     return redirect(url_for("auth.login"))
