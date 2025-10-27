@@ -2,19 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lab 3</title>
+    <title>Lab 4</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <header>
-        <h1>Lab 3</h1>
+        <h1>Lab 4</h1>
         <nav>
             <a href="/">Home</a>
         </nav>
     </header>
 
     <main>
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
         {% block content %}
+        <nav>
+            <a href="{{ url_for('auth.login') }}">Login</a>
+            <a href="{{ url_for('auth.profile') }}">Profile</a>
+        </nav>
+        
+
+        
         <form method="post">
             <label for="username">Enter username:</label>
             <input type="text" id="username" name="username" required>
