@@ -30,6 +30,7 @@ def profile():
         return redirect(url_for("auth.login"))
 
     username = session["username"]
+    theme = request.cookies.get("theme", "light")
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -66,9 +67,19 @@ def profile():
         return resp
 
     cookies = request.cookies.items()
-    return render_template("auth/profile.html", username=username, cookies=cookies)
+    return render_template("auth/profile.html", username=username, cookies=cookies, theme=theme,)
 
 
+@auth_bp.route("/set_theme/<theme>")
+def set_theme(theme):
+    if theme not in ["light", "dark"]:
+        flash("Invalid theme selected!", "error")
+        return redirect(url_for("auth.profile"))
+
+    resp = make_response(redirect(url_for("auth.profile")))
+    resp.set_cookie("theme", theme, max_age=60*60*24*30)
+    flash(f"Theme changed to {theme} mode!", "info")
+    return resp
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():

@@ -1,11 +1,18 @@
+/* ===============================
+   GLOBAL
+================================*/
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-color: #f4f7fa;
-  color: #333;
+  background-color: var(--body-bg);
+  color: var(--text-color);
   margin: 0;
   padding: 0;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+/* ===============================
+   HEADER
+================================*/
 header {
   background: linear-gradient(90deg, #007bff, #004aad);
   color: white;
@@ -19,6 +26,9 @@ header h1 {
   font-size: 24px;
 }
 
+/* ===============================
+   NAVIGATION
+================================*/
 nav {
   margin-top: 10px;
 }
@@ -36,15 +46,23 @@ nav a:hover {
   border-bottom: 2px solid #ffc107;
 }
 
-main {
+/* ===============================
+   MAIN CONTENT
+================================*/
+main.profile-page {
   max-width: 900px;
   margin: 30px auto;
-  padding: 20px;
-  background: white;
+  padding: 25px;
   border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  background: var(--main-bg);
+  color: var(--main-text);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
+/* ===============================
+   HEADINGS
+================================*/
 h2 {
   color: #007bff;
   margin-bottom: 1rem;
@@ -53,6 +71,9 @@ h2 {
   display: inline-block;
 }
 
+/* ===============================
+   FORMS
+================================*/
 form {
   margin-top: 15px;
 }
@@ -64,24 +85,32 @@ label {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="number"],
+textarea {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   box-sizing: border-box;
   margin-bottom: 10px;
   font-size: 15px;
-  transition: border-color 0.3s ease;
+  background: var(--input-bg);
+  color: var(--input-text);
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input:focus,
+textarea:focus {
   border-color: #007bff;
   outline: none;
 }
 
-button {
+/* ===============================
+   BUTTONS
+================================*/
+button,
+.theme-switch .btn {
   background-color: #007bff;
   color: white;
   border: none;
@@ -91,13 +120,28 @@ button {
   font-size: 15px;
   font-weight: 600;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
-button:hover {
+button:hover,
+.theme-switch .btn:hover {
   background-color: #0056b3;
   transform: translateY(-2px);
 }
 
+.logout-btn {
+  margin-top: 20px;
+  background: #dc3545;
+}
+
+.logout-btn:hover {
+  background: #b52a36;
+}
+
+/* ===============================
+   FLASH MESSAGES
+================================*/
 .flash-messages {
   margin: 20px auto;
   width: 80%;
@@ -114,24 +158,60 @@ button:hover {
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.flash.success {
-  background-color: #28a745;
-}
-
-.flash.danger {
-  background-color: #dc3545;
-}
-
-.flash.warning {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.flash.info {
-  background-color: #17a2b8;
-}
+.flash.success { background-color: #28a745; }
+.flash.danger { background-color: #dc3545; }
+.flash.warning { background-color: #ffc107; color: #333; }
+.flash.info { background-color: #17a2b8; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   COOKIE TABLE
+================================*/
+.cookies-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.cookies-table th,
+.cookies-table td {
+  padding: 10px;
+  border: 1px solid var(--table-border);
+  transition: background 0.3s;
+}
+
+/* ===============================
+   THEMES (Variables)
+================================*/
+body.light {
+  --body-bg: #f4f7fa;
+  --text-color: #333;
+  --main-bg: #ffffff;
+  --main-text: #333;
+  --input-bg: #ffffff;
+  --input-text: #000;
+  --input-border: #ccc;
+  --table-border: #ccc;
+}
+
+body.dark {
+  --body-bg: #1e1e1e;
+  --text-color: #f0f0f0;
+  --main-bg: #2a2a2a;
+  --main-text: #f1f1f1;
+  --input-bg: #333;
+  --input-text: #fff;
+  --input-border: #555;
+  --table-border: #555;
+}
+
+/* ===============================
+   THEME SWITCH
+================================*/
+.theme-switch {
+  margin: 20px 0;
 }
