@@ -13,7 +13,7 @@
         </nav>
     </header>
 
-    <main>
+    <main id="main-page">
         <div class="flash-messages">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -29,9 +29,7 @@
             <a href="{{ url_for('auth.login') }}">Login</a>
             <a href="{{ url_for('auth.profile') }}">Profile</a>
         </nav>
-        
 
-        
         <form method="post">
             <label for="username">Enter username:</label>
             <input type="text" id="username" name="username" required>
@@ -47,8 +45,6 @@
 
             <button type="submit">Go to User</button>
         </form>
-
-        <br><br>
 
         <form method="post">
             <label for="product">Enter product name:</label>

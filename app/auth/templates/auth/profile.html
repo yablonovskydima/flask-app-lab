@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<main class="profile-page">
+<main id="profile-page">
   <h2>Welcome, {{ username }}!</h2>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -59,4 +59,5 @@
     <button type="submit" class="logout-btn">Logout</button>
   </form>
 </main>
+
 {% endblock %}
