@@ -5,7 +5,6 @@ import logging
 
 contact_bp = Blueprint("contact", __name__, template_folder="templates")
 
-# Setup logging
 LOG_FILE = os.path.join("logs", "contact.log")
 os.makedirs("logs", exist_ok=True)
 
@@ -26,11 +25,10 @@ def contact():
         subject = form.subject.data
         message = form.message.data
 
-        # Write to log file
         logger.info(f"Contact form submitted: {name} ({email}), {phone}, {subject}, {message}")
 
         flash(f"Thank you, {name}! Your message has been successfully sent.", "success")
-        return redirect(url_for("contact.contact"))  # Post/Redirect/Get
+        return redirect(url_for("contact.contact"))
 
     elif request.method == "POST":
         flash("Please check the form fields and try again.", "danger")

@@ -1,26 +1,31 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response
+from flask import Blueprint, render_template, redirect, url_for, session, flash, request, make_response
+from app.auth.forms import LoginForm
 
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
 
-#example data
+# Example user data
 VALID_USERNAME = "admin"
 VALID_PASSWORD = "1234"
 
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        remember = form.remember.data
 
         if username == VALID_USERNAME and password == VALID_PASSWORD:
             session["username"] = username
-            flash("Login successful!", "success")
+            flash(f"Login successful! Remember: {'enabled' if remember else 'disabled'}.", "success")
             return redirect(url_for("auth.profile"))
         else:
-            flash("Invalid username or password", "danger")
+            flash("Invalid username or password.", "danger")
             return redirect(url_for("auth.login"))
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", form=form)
 
 
 @auth_bp.route("/profile", methods=["GET", "POST"])
@@ -67,7 +72,7 @@ def profile():
         return resp
 
     cookies = request.cookies.items()
-    return render_template("auth/profile.html", username=username, cookies=cookies, theme=theme,)
+    return render_template("auth/profile.html", username=username, cookies=cookies, theme=theme)
 
 
 @auth_bp.route("/set_theme/<theme>")
@@ -77,9 +82,10 @@ def set_theme(theme):
         return redirect(url_for("auth.profile"))
 
     resp = make_response(redirect(url_for("auth.profile")))
-    resp.set_cookie("theme", theme, max_age=60*60*24*30)
+    resp.set_cookie("theme", theme, max_age=60 * 60 * 24 * 30)
     flash(f"Theme changed to {theme} mode!", "info")
     return resp
+
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
