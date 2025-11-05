@@ -1,13 +1,16 @@
 {% macro render_field(field) %}
-<div class="form-group">
-    {{ field.label }}<br>
-    {{ field(class="form-control") }}
+<div class="mb-3">
+    {{ field.label(class="form-label fw-semibold") }}
+    {{ field(class="form-control", placeholder=field.label.text) }}
+
     {% if field.errors %}
-        <ul class="errors">
-        {% for error in field.errors %}
-            <li style="color: red;">{{ error }}</li>
-        {% endfor %}
-        </ul>
+        <div class="mt-1">
+            {% for error in field.errors %}
+                <div class="text-danger small">
+                    <i class="bi bi-exclamation-circle-fill"></i> {{ error }}
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 </div>
 {% endmacro %}

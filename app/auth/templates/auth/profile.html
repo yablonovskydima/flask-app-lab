@@ -56,8 +56,10 @@
   </section>
 
   <form method="POST" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="logout-btn">Logout</button>
   </form>
+
 </main>
 
 {% endblock %}
