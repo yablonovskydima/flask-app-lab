@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Create Post{% endblock %}
+{% block title %}Edit Post{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-  <h2 class="mb-4">Create a New Post</h2>
+  <h2 class="mb-4">Edit Post</h2>
 
-  <form method="POST" action="{{ url_for('posts.create_post') }}">
+  <form method="POST" action="{{ url_for('posts.update_post', id=post.id) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="mb-3">
       <label for="title" class="form-label">Title</label>
       <input
@@ -14,7 +15,7 @@
         class="form-control"
         id="title"
         name="title"
-        placeholder="Enter title"
+        value="{{ post.title }}"
         required
       />
     </div>
@@ -25,19 +26,18 @@
         class="form-control"
         id="content"
         name="content"
-        rows="5"
-        placeholder="Write your post content here..."
+        rows="6"
         required
-      ></textarea>
+      >{{ post.content }}</textarea>
     </div>
 
     <div class="mb-3">
       <label for="category" class="form-label">Category</label>
-      <select class="form-select" id="category" name="category">
-        <option value="NEWS">News</option>
-        <option value="PUBLICATION">Publication</option>
-        <option value="TECH">Tech</option>
-        <option value="OTHER" selected>Other</option>
+      <select class="form-select" id="CATEGORY" name="CATEGORY">
+        <option value="NEWS" {% if post.category.value == "NEWS" %}selected{% endif %}>News</option>
+        <option value="PUBLICATION" {% if post.category.value == "PUBLICATION" %}selected{% endif %}>Publication</option>
+        <option value="TECH" {% if post.category.value == "TECH" %}selected{% endif %}>Tech</option>
+        <option value="OTHER" {% if post.category.value == "OTHER" %}selected{% endif %}>Other</option>
       </select>
     </div>
 
@@ -48,7 +48,7 @@
         class="form-control"
         id="author"
         name="author"
-        placeholder="Enter author name (default: Anonymous)"
+        value="{{ post.author }}"
       />
     </div>
 
@@ -56,18 +56,17 @@
       <input
         class="form-check-input"
         type="checkbox"
-        value="true"
         id="is_active"
         name="is_active"
-        checked
+        {% if post.is_active %}checked{% endif %}
       />
       <label class="form-check-label" for="is_active">
         Active (Visible on site)
       </label>
     </div>
 
-    <button type="submit" class="btn btn-primary">Create Post</button>
-    <a href="{{ url_for('posts.list_posts') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-success">Save changes</button>
+    <a href="{{ url_for('posts.show_post', id=post.id) }}" class="btn btn-secondary">Cancel</a>
   </form>
 </div>
 {% endblock %}

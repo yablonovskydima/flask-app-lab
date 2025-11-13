@@ -30,12 +30,14 @@ def create_app(config_name="development"):
     from app.products.views import products_bp
     from app.auth.views import auth_bp
     from app.contact.views import contact_bp
+    from app.posts.views import post_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(users_bp, url_prefix="/users")
     app.register_blueprint(products_bp, url_prefix="/products")
     app.register_blueprint(contact_bp, url_prefix="/contact")
+    app.register_blueprint(post_bp)
 
     @app.errorhandler(404)
     def not_found(e):
