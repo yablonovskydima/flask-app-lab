@@ -22,6 +22,8 @@ class Post(db.Model):
         default=PostCategory.OTHER,
         nullable=False
     )
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    author = db.Column(db.String(20), default="Anonymous", nullable=False)
 
     def __repr__(self):
         return f"<Post id={self.id} title='{self.title}' category='{self.category.value}'>"

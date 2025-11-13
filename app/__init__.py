@@ -1,15 +1,14 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import os
 
 db = SQLAlchemy()
 migrate = Migrate()
 csrf = CSRFProtect()
 
-def create_app():
-    from app.config import DevelopmentConfig, TestingConfig, ProductionConfig
+def create_app(config_name="development"):
+    from config import DevelopmentConfig, TestingConfig, ProductionConfig
 
     config_classes = {
         "development": DevelopmentConfig,
@@ -24,7 +23,7 @@ def create_app():
     migrate.init_app(app, db)
     csrf.init_app(app)
 
-    from app import models
+    from app.posts import models
 
     from app.views import main_bp
     from app.users.views import users_bp
@@ -39,7 +38,7 @@ def create_app():
     app.register_blueprint(contact_bp, url_prefix="/contact")
 
     @app.errorhandler(404)
-    def not_found(e)
-        return render_tempalte("404.html"). 404
+    def not_found(e):
+        return render_template("404.html"), 404
 
     return app
