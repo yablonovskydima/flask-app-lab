@@ -6,66 +6,46 @@
   <h2 class="mb-4">Edit Post</h2>
 
   <form method="POST" action="{{ url_for('posts.update_post', id=post.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ form.hidden_tag() }}
 
     <div class="mb-3">
-      <label for="title" class="form-label">Title</label>
-      <input
-        type="text"
-        class="form-control"
-        id="title"
-        name="title"
-        value="{{ post.title }}"
-        required
-      />
+      {{ form.title.label(class="form-label") }}
+      {{ form.title(class="form-control", id="title") }}
+      {% for error in form.title.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <div class="mb-3">
-      <label for="content" class="form-label">Content</label>
-      <textarea
-        class="form-control"
-        id="content"
-        name="content"
-        rows="6"
-        required
-      >{{ post.content }}</textarea>
+      {{ form.content.label(class="form-label") }}
+      {{ form.content(class="form-control", id="content", rows="6") }}
+      {% for error in form.content.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <div class="mb-3">
-      <label for="category" class="form-label">Category</label>
-      <select class="form-select" id="CATEGORY" name="CATEGORY">
-        <option value="NEWS" {% if post.category.value == "NEWS" %}selected{% endif %}>News</option>
-        <option value="PUBLICATION" {% if post.category.value == "PUBLICATION" %}selected{% endif %}>Publication</option>
-        <option value="TECH" {% if post.category.value == "TECH" %}selected{% endif %}>Tech</option>
-        <option value="OTHER" {% if post.category.value == "OTHER" %}selected{% endif %}>Other</option>
-      </select>
-    </div>
-
-    <div class="mb-3">
-      <label for="author" class="form-label">Author</label>
-      <input
-        type="text"
-        class="form-control"
-        id="author"
-        name="author"
-        value="{{ post.author }}"
-      />
+      {{ form.category.label(class="form-label") }}
+      {{ form.category(class="form-select", id="category") }}
+      {% for error in form.category.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <div class="form-check mb-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        id="is_active"
-        name="is_active"
-        {% if post.is_active %}checked{% endif %}
-      />
-      <label class="form-check-label" for="is_active">
-        Active (Visible on site)
-      </label>
+      {{ form.enabled(class="form-check-input", id="is_active") }}
+      {{ form.enabled.label(class="form-check-label", for="is_active") }}
     </div>
 
-    <button type="submit" class="btn btn-success">Save changes</button>
+    <div class="mb-3">
+      {{ form.posted.label(class="form-label") }}
+      {{ form.posted(class="form-control", id="posted") }}
+      {% for error in form.posted.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
     <a href="{{ url_for('posts.show_post', id=post.id) }}" class="btn btn-secondary">Cancel</a>
   </form>
 </div>

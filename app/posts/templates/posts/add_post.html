@@ -1,73 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Create Post{% endblock %}
-
 {% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4">Create a New Post</h2>
+  <h2>Create Post</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
 
-  <form method="POST" action="{{ url_for('posts.create_post') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="mb-3">
-      <label for="title" class="form-label">Title</label>
-      <input
-        type="text"
-        class="form-control"
-        id="title"
-        name="title"
-        placeholder="Enter title"
-        required
-      />
+    <div>
+      {{ form.title.label }}<br>
+      {{ form.title(size=50) }}
+      {% for error in form.title.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
     </div>
 
-    <div class="mb-3">
-      <label for="content" class="form-label">Content</label>
-      <textarea
-        class="form-control"
-        id="content"
-        name="content"
-        rows="5"
-        placeholder="Write your post content here..."
-        required
-      ></textarea>
+    <div>
+      {{ form.content.label }}<br>
+      {{ form.content(rows=5, cols=50) }}
+      {% for error in form.content.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
     </div>
 
-    <div class="mb-3">
-      <label for="category" class="form-label">Category</label>
-      <select class="form-select" id="category" name="category">
-        <option value="NEWS">News</option>
-        <option value="PUBLICATION">Publication</option>
-        <option value="TECH">Tech</option>
-        <option value="OTHER" selected>Other</option>
-      </select>
+    <div>
+      {{ form.enabled.label }} {{ form.enabled() }}
     </div>
 
-    <div class="mb-3">
-      <label for="author" class="form-label">Author</label>
-      <input
-        type="text"
-        class="form-control"
-        id="author"
-        name="author"
-        placeholder="Enter author name (default: Anonymous)"
-      />
+    <div>
+      {{ form.posted.label }}<br>
+      {{ form.posted() }}
+      {% for error in form.posted.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
     </div>
 
-    <div class="form-check mb-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        value="true"
-        id="is_active"
-        name="is_active"
-        checked
-      />
-      <label class="form-check-label" for="is_active">
-        Active (Visible on site)
-      </label>
+    <div>
+      {{ form.category.label }}<br>
+      {{ form.category() }}
+      {% for error in form.category.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
     </div>
 
-    <button type="submit" class="btn btn-primary">Create Post</button>
-    <a href="{{ url_for('posts.list_posts') }}" class="btn btn-secondary">Cancel</a>
+    <div>
+      {{ form.submit() }}
+    </div>
   </form>
-</div>
 {% endblock %}

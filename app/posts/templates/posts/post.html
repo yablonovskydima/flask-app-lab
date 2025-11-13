@@ -32,9 +32,8 @@
           <a href="{{ url_for('posts.show_post', id=post.id) }}" class="btn btn-sm btn-outline-primary">View</a>
           <a href="{{ url_for('posts.update_post', id=post.id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
           <form
-            method="POST"
+            method="GET"
             action="{{ url_for('posts.delete_post', id=post.id) }}"
-            onsubmit="return confirm('Are you sure you want to delete this post?');"
           >
            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
