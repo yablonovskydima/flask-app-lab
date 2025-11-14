@@ -2,40 +2,70 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h2 class="card-title mb-3">{{ post.title }}</h2>
+<div class="container">
 
-      <div class="text-muted mb-3">
-        <small>
-          Posted on {{ post.posted.strftime("%Y-%m-%d %H:%M") }}
-          by <strong>{{ post.author or "Anonymous" }}</strong> |
-          Category: <span class="badge bg-info text-dark">{{ post.category.value if post.category else post.category }}</span>
-        </small>
+  <div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <article class="post-detail-card">
+
+    <div class="post-detail-image">
+      <img src="{{ url_for('static', filename='img/img.png') }}" alt="{{ post.title }}">
+    </div>
+
+    <div class="post-detail-body">
+
+      <h1 class="post-detail-title">{{ post.title }}</h1>
+
+      <div class="post-detail-meta">
+        <span class="author">
+          <strong>{{ post.author or "Anonymous" }}</strong>
+        </span>
+        <span class="separator">•</span>
+        <span class="date">{{ post.posted.strftime("%d %B %Y") }}</span>
+        <span class="separator">•</span>
+        <span class="category-badge">
+          {{ post.category.value if post.category else "news" }}
+        </span>
       </div>
 
-      <p class="card-text">{{ post.content }}</p>
+      <div class="post-detail-content">
+        {{ post.content | safe }}
+      </div>
 
       {% if not post.is_active %}
-      <div class="alert alert-warning mt-3">
+      <div class="flash warning mt-4">
         This post is inactive and not visible to regular users.
       </div>
       {% endif %}
+
+      <div class="post-detail-actions">
+        <a href="{{ url_for('posts.update_post', id=post.id) }}" class="btn btn-outline-warning">
+          Edit
+        </a>
+
+        <form method="POST" action="{{ url_for('posts.delete_post', id=post.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to delete this post?')">
+            Delete
+          </button>
+        </form>
+
+        <a href="{{ url_for('posts.list_posts') }}" class="btn btn-outline">
+          Back to Posts
+        </a>
+      </div>
+
     </div>
-  </div>
+  </article>
 
-  <div class="mt-4 d-flex gap-2">
-    <a href="{{ url_for('posts.update_post', id=post.id) }}" class="btn btn-warning">
-      Edit
-    </a>
-
-    <form action="{{ url_for('posts.delete_post', id=post.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="btn btn-danger">Delete</button>
-    </form>
-
-    <a href="{{ url_for('posts.list_posts') }}" class="btn btn-secondary">Back to all posts</a>
-  </div>
 </div>
 {% endblock %}

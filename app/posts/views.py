@@ -11,7 +11,7 @@ post_bp = Blueprint("posts", __name__, template_folder="templates")
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
-        author = session["username"]
+        author = session.get("username", "Anonymous")
 
         post = Post(
             title=form.title.data,
