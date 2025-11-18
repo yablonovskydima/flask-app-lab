@@ -1,6 +1,6 @@
 from app import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, String, Float
+from sqlalchemy import Integer, String, Float, Boolean
 
 class ProductCategory(db.Model):
     __tablename__ = 'product_categories'
@@ -20,6 +20,7 @@ class Product(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     price: Mapped[float] = mapped_column(Float, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     category_id: Mapped[int | None] = mapped_column(
         db.ForeignKey('product_categories.id'), nullable=True
