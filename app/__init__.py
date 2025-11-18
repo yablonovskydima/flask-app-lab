@@ -24,6 +24,7 @@ def create_app(config_name="development"):
     csrf.init_app(app)
 
     from app.posts import models
+    from app.products import models
 
     from app.views import main_bp
     from app.users.views import users_bp
