@@ -3,23 +3,23 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from app.posts.forms import PostForm
 from app import db
-from app.posts.models import Post
+from app.posts.models import Post, PostCategory
 
 post_bp = Blueprint("posts", __name__, template_folder="templates")
 
 @post_bp.route('/post/create', methods=['GET', 'POST'])
 def create_post():
     form = PostForm()
-    if form.validate_on_submit():
-        author = session.get("username", "Anonymous")
+    form.set_author_choices()
 
+    if form.validate_on_submit():
         post = Post(
             title=form.title.data,
             content=form.content.data,
-            author=author,
+            author_id=form.author.data,
             is_active=form.enabled.data,
             posted=form.posted.data,
-            category=form.category.data
+            category=PostCategory[form.category.data]
         )
         db.session.add(post)
         db.session.commit()
@@ -27,6 +27,7 @@ def create_post():
         return redirect(url_for('posts.list_posts'))
 
     return render_template('posts/add_post.html', form=form)
+
 
 
 @post_bp.route("/post")
@@ -55,11 +56,17 @@ def update_post(id):
         abort(404)
 
     form = PostForm(obj=post)
+    form.set_author_choices()
+
+    if request.method == "GET":
+        form.author.data = post.author_id
+        form.category.data = post.category.name
 
     if form.validate_on_submit():
         post.title = form.title.data
         post.content = form.content.data
-        post.category = form.category.data
+        post.author_id = form.author.data
+        post.category = PostCategory[form.category.data]
         post.is_active = form.enabled.data
         post.posted = form.posted.data
 

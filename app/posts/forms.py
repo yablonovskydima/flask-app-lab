@@ -12,6 +12,7 @@ class PostForm(FlaskForm):
         'Content',
         validators=[DataRequired(message="Content is required"), Length(min=10)]
     )
+    author = SelectField('Author', coerce=int, validators=[DataRequired()])
     enabled = BooleanField('Enabled')
     posted = DateTimeLocalField(
         'Posted',
@@ -30,3 +31,7 @@ class PostForm(FlaskForm):
         validators=[DataRequired()]
     )
     submit = SubmitField('Submit')
+
+    def set_author_choices(self):
+        from app.users.models import User  # імпорт всередині методу, щоб уникнути циклічних імпортів
+        self.author.choices = [(u.id, u.username) for u in User.query.order_by(User.username).all()]

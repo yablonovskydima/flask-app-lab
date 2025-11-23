@@ -36,6 +36,7 @@ def create_app(config_name="development"):
 
     from app.posts import models
     from app.products import models
+    from app.users import models
 
     from app.views import main_bp
     from app.users.views import users_bp
