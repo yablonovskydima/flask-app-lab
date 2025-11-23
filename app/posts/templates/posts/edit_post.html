@@ -45,7 +45,13 @@
       {% endfor %}
     </div>
 
-
+    <div class="mb-3">
+      {{ form.tags.label(class="form-label") }}
+      {{ form.tags(class="form-select", multiple=True) }}
+      {% for error in form.tags.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
 
     <div class="mb-3">
       {{ form.posted.label(class="form-label") }}

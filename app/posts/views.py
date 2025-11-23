@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from app.posts.forms import PostForm
 from app import db
-from app.posts.models import Post, PostCategory
+from app.posts.models import Post, PostCategory, Tag 
 
 post_bp = Blueprint("posts", __name__, template_folder="templates")
 
@@ -11,6 +11,7 @@ post_bp = Blueprint("posts", __name__, template_folder="templates")
 def create_post():
     form = PostForm()
     form.set_author_choices()
+    form.set_tag_choices()
 
     if form.validate_on_submit():
         post = Post(
@@ -21,6 +22,8 @@ def create_post():
             posted=form.posted.data,
             category=PostCategory[form.category.data]
         )
+        post.tags = Tag.query.filter(Tag.id.in_(form.tags.data)).all()
+
         db.session.add(post)
         db.session.commit()
         flash('Post created successfully!', 'success')
@@ -57,24 +60,25 @@ def update_post(id):
 
     form = PostForm(obj=post)
     form.set_author_choices()
+    form.set_tag_choices()
 
-    if request.method == "GET":
-        form.author.data = post.author_id
-        form.category.data = post.category.name
+    form.tags.data = [t.id for t in post.tags]
 
     if form.validate_on_submit():
         post.title = form.title.data
         post.content = form.content.data
-        post.author_id = form.author.data
         post.category = PostCategory[form.category.data]
         post.is_active = form.enabled.data
         post.posted = form.posted.data
+        post.author_id = form.author.data
+        post.tags = Tag.query.filter(Tag.id.in_(form.tags.data)).all()
 
         db.session.commit()
         flash("Post updated successfully!", "success")
         return redirect(url_for("posts.show_post", id=post.id))
 
     return render_template("posts/edit_post.html", form=form, post=post)
+
 
 
 @post_bp.route("/post/<int:id>/delete", methods=["GET", "POST"])

@@ -32,10 +32,19 @@
 
       <h5 class="post-title">{{ post.title }}</h5>
       <p class="post-meta">
-        <strong>{{ post.author or "Anonymous" }}</strong> • 
+        <strong>{{ post.author.username if post.author else "Anonymous" }}</strong> • 
         <span>{{ post.posted.strftime("%Y-%m-%d") }}</span>
       </p>
+
       <p class="post-content">{{ post.content }}</p>
+
+      {% if post.tags %}
+      <div class="post-tags mb-2">
+        {% for tag in post.tags %}
+          <span class="badge bg-secondary">{{ tag.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <div class="post-footer">
         <span class="category-badge">
@@ -50,7 +59,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-sm btn-danger">
                 Delete
-              </button>
+            </button>
           </form>
         </div>
       </div>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, BooleanField, SelectField, SubmitField, DateTimeLocalField
+from wtforms import StringField, TextAreaField, BooleanField, SelectField, SelectMultipleField, SubmitField, DateTimeLocalField
 from wtforms.validators import DataRequired, Length
 from datetime import datetime
 
@@ -13,6 +13,7 @@ class PostForm(FlaskForm):
         validators=[DataRequired(message="Content is required"), Length(min=10)]
     )
     author = SelectField('Author', coerce=int, validators=[DataRequired()])
+    tags = SelectMultipleField('Tags', coerce=int)
     enabled = BooleanField('Enabled')
     posted = DateTimeLocalField(
         'Posted',
@@ -33,5 +34,9 @@ class PostForm(FlaskForm):
     submit = SubmitField('Submit')
 
     def set_author_choices(self):
-        from app.users.models import User  # імпорт всередині методу, щоб уникнути циклічних імпортів
+        from app.users.models import User
         self.author.choices = [(u.id, u.username) for u in User.query.order_by(User.username).all()]
+
+    def set_tag_choices(self):
+        from app.posts.models import Tag
+        self.tags.choices = [(t.id, t.name) for t in Tag.query.order_by(Tag.name).all()]
