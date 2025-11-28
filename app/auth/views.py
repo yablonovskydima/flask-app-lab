@@ -1,31 +1,50 @@
 from flask import Blueprint, render_template, redirect, url_for, session, flash, request, make_response
-from app.auth.forms import LoginForm
+from app.auth.login_forms import LoginForm
+from app.auth.register_forms import RegisterForm
+from app.users.models import User
+from app import bcrypt
+from app import db
 
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
-
-# Example user data
-VALID_USERNAME = "admin"
-VALID_PASSWORD = "1234"
-
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
 
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        remember = form.remember.data
+    if form.validate():
+        user = form.user
 
-        if username == VALID_USERNAME and password == VALID_PASSWORD:
-            session["username"] = username
-            flash(f"Login successful! Remember: {'enabled' if remember else 'disabled'}.", "success")
-            return redirect(url_for("auth.profile"))
-        else:
-            flash("Invalid username or password.", "danger")
-            return redirect(url_for("auth.login"))
+        session["username"] = user.username
+        session["email"] = user.email
+        session["user_id"] = user.id
+
+        flash("Login successful!", "success")
+        return redirect(url_for("auth.account"))
 
     return render_template("auth/login.html", form=form)
+
+@auth_bp.route("/account")
+def account():
+    if "username" not in session:
+        flash("Please log in first!", "danger")
+        return redirect(url_for("auth.login"))
+
+    username = session.get("username")
+    email = session.get("email")
+    user_id = session.get("user_id")
+
+    users = User.query.all()
+    users_count = len(users)
+
+    return render_template(
+        "auth/account.html",
+        username=username,
+        email=email,
+        user_id=user_id,
+        users=users,
+        users_count=users_count
+    )
+
 
 
 @auth_bp.route("/profile", methods=["GET", "POST"])
@@ -73,6 +92,28 @@ def profile():
 
     cookies = request.cookies.items()
     return render_template("auth/profile.html", username=username, cookies=cookies, theme=theme)
+
+
+@auth_bp.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Registration successful! Please log in.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/register.html", form=form)
 
 
 @auth_bp.route("/set_theme/<theme>")

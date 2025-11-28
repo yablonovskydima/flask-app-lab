@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.profile') }}"><h3>Profile</h3></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<h2>Your Account</h2>
+
+<div class="card p-3 mb-4 shadow-sm">
+    <p><strong>Username:</strong> {{ username }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <p><strong>User ID:</strong> {{ user_id }}</p>
+</div>
+
+<hr>
+
+<h3 class="mb-3">All Registered Users ({{ users_count }})</h3>
+
+{% if users_count == 0 %}
+    <p>No users registered yet.</p>
+{% else %}
+<table class="table table-bordered table-hover shadow-sm">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<div class="d-flex justify-content-center mt-4">
+    <form method="POST" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-danger px-4" type="submit">Logout</button>
+    </form>
+</div>
+
+{% endblock %}

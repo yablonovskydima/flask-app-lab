@@ -3,7 +3,8 @@ from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase 
+from sqlalchemy.orm import DeclarativeBase
+from flask_bcrypt import Bcrypt
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention={
@@ -17,6 +18,7 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 csrf = CSRFProtect()
+bcrypt = Bcrypt()
 
 def create_app(config_name="development"):
     from config import DevelopmentConfig, TestingConfig, ProductionConfig
@@ -32,6 +34,7 @@ def create_app(config_name="development"):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    bcrypt.init_app(app)
     csrf.init_app(app)
 
     from app.posts import models
