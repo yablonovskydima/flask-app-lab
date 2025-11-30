@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, session, flash,
 from app.auth.login_forms import LoginForm
 from app.auth.register_forms import RegisterForm
 from app.users.models import User
+from flask_login import login_user, logout_user, login_required, current_user
 from app import bcrypt
 from app import db
 
@@ -14,9 +15,7 @@ def login():
     if form.validate():
         user = form.user
 
-        session["username"] = user.username
-        session["email"] = user.email
-        session["user_id"] = user.id
+        login_user(user)
 
         flash("Login successful!", "success")
         return redirect(url_for("auth.account"))
@@ -24,36 +23,22 @@ def login():
     return render_template("auth/login.html", form=form)
 
 @auth_bp.route("/account")
+@login_required
 def account():
-    if "username" not in session:
-        flash("Please log in first!", "danger")
-        return redirect(url_for("auth.login"))
-
-    username = session.get("username")
-    email = session.get("email")
-    user_id = session.get("user_id")
-
     users = User.query.all()
-    users_count = len(users)
 
     return render_template(
         "auth/account.html",
-        username=username,
-        email=email,
-        user_id=user_id,
+        user=current_user,
         users=users,
-        users_count=users_count
+        users_count=len(users),
     )
 
 
 
 @auth_bp.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
-    if "username" not in session:
-        flash("Please log in first!", "error")
-        return redirect(url_for("auth.login"))
-
-    username = session["username"]
     theme = request.cookies.get("theme", "light")
 
     if request.method == "POST":
@@ -91,7 +76,12 @@ def profile():
         return resp
 
     cookies = request.cookies.items()
-    return render_template("auth/profile.html", username=username, cookies=cookies, theme=theme)
+    return render_template(
+        "auth/profile.html",
+        user=current_user,
+        cookies=cookies,
+        theme=theme
+    )
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -129,7 +119,8 @@ def set_theme(theme):
 
 
 @auth_bp.route("/logout", methods=["POST"])
+@login_required
 def logout():
-    session.pop("username", None)
-    flash("You have been logged out!", "info")
+    logout_user()
+    flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))

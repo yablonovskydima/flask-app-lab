@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention={
@@ -19,6 +20,7 @@ db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 csrf = CSRFProtect()
 bcrypt = Bcrypt()
+login_manager = LoginManager()
 
 def create_app(config_name="development"):
     from config import DevelopmentConfig, TestingConfig, ProductionConfig
@@ -31,6 +33,10 @@ def create_app(config_name="development"):
 
     app = Flask(__name__)
     app.config.from_object(config_classes.get(config_name, DevelopmentConfig))
+
+    login_manager.init_app(app)
+    login_manager.login_view = "auth.login"
+    login_manager.login_message_category = "warning"
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -60,3 +66,9 @@ def create_app(config_name="development"):
         return render_template("404.html"), 404
 
     return app
+
+from app.users.models import User
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
