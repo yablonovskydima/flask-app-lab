@@ -18,6 +18,9 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    about_me: Mapped[str] = mapped_column(String(200), nullable=True)
+    last_seen: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
     image: Mapped[str] = mapped_column(
         String(255),
         nullable=True,

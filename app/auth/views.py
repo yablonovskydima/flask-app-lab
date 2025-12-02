@@ -3,11 +3,12 @@ from app.auth.login_forms import LoginForm
 from app.auth.register_forms import RegisterForm
 from app.users.models import User
 from flask_login import login_user, logout_user, login_required, current_user
-from app import bcrypt
-from app import db
+from app import bcrypt, db
 from app.auth.update_account_forms import UpdateAccountForm
+from app.auth.change_password_forms import ChangePasswordForm
 import os
 from PIL import Image
+from datetime import datetime
 
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
 
@@ -128,39 +129,27 @@ def update_account():
     if request.method == "GET":
         form.username.data = current_user.username
         form.email.data = current_user.email
+        form.about_me.data = current_user.about_me
 
     if form.validate_on_submit():
-
         current_user.username = form.username.data
         current_user.email = form.email.data
+        current_user.about_me = form.about_me.data
 
         if form.image.data:
-            picture_file = form.image.data
             filename = f"user_{current_user.id}.jpg"
-
-            # Шляхи
             save_path = os.path.join(current_app.root_path, "static/profile_pictures", filename)
             icon_path = os.path.join(current_app.root_path, "static/profile_pictures/icons", filename)
-
-            # Створити директорії якщо їх нема
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             os.makedirs(os.path.dirname(icon_path), exist_ok=True)
 
-            # Відкрити та конвертувати у RGB
-            img = Image.open(picture_file)
-            img = img.convert("RGB")  # конвертуємо у JPG
-
-            # Зберегти оригінал у JPG
+            img = Image.open(form.image.data)
+            img = img.convert("RGB")
             img.save(save_path, "JPEG")
-
-            # Створити thumbnail 128x128
             img.thumbnail((128, 128))
             img.save(icon_path, "JPEG")
 
-            # Оновлюємо у БД
             current_user.image = filename
-
-
 
         db.session.commit()
         flash("Your account has been updated!", "success")
@@ -181,3 +170,37 @@ def logout():
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))
+
+@auth_bp.before_app_request
+def update_last_seen():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+
+@auth_bp.route("/account/update_about_me", methods=["POST"])
+@login_required
+def update_about_me():
+    about_me = request.form.get("about_me", "").strip()
+    current_user.about_me = about_me
+    db.session.commit()
+    flash("Your description has been updated!", "success")
+    return redirect(url_for("auth.account"))
+
+@auth_bp.route("/account/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
+        flash("Your password has been updated!", "success")
+        return redirect(url_for("auth.account"))
+
+    if request.method == "POST" and not form.validate():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field.capitalize()}: {error}", "warning")
+
+    return render_template("auth/change_password.html", form=form)
