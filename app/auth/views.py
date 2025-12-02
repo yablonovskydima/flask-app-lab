@@ -1,10 +1,13 @@
-from flask import Blueprint, render_template, redirect, url_for, session, flash, request, make_response
+from flask import Blueprint, render_template, redirect, url_for, session, flash, request, make_response, current_app
 from app.auth.login_forms import LoginForm
 from app.auth.register_forms import RegisterForm
 from app.users.models import User
 from flask_login import login_user, logout_user, login_required, current_user
 from app import bcrypt
 from app import db
+from app.auth.update_account_forms import UpdateAccountForm
+import os
+from PIL import Image
 
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
 
@@ -116,6 +119,60 @@ def set_theme(theme):
     resp.set_cookie("theme", theme, max_age=60 * 60 * 24 * 30)
     flash(f"Theme changed to {theme} mode!", "info")
     return resp
+
+@auth_bp.route("/account/update", methods=["GET", "POST"])
+@login_required
+def update_account():
+    form = UpdateAccountForm()
+
+    if request.method == "GET":
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+
+    if form.validate_on_submit():
+
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+
+        if form.image.data:
+            picture_file = form.image.data
+            filename = f"user_{current_user.id}.jpg"
+
+            # Шляхи
+            save_path = os.path.join(current_app.root_path, "static/profile_pictures", filename)
+            icon_path = os.path.join(current_app.root_path, "static/profile_pictures/icons", filename)
+
+            # Створити директорії якщо їх нема
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            os.makedirs(os.path.dirname(icon_path), exist_ok=True)
+
+            # Відкрити та конвертувати у RGB
+            img = Image.open(picture_file)
+            img = img.convert("RGB")  # конвертуємо у JPG
+
+            # Зберегти оригінал у JPG
+            img.save(save_path, "JPEG")
+
+            # Створити thumbnail 128x128
+            img.thumbnail((128, 128))
+            img.save(icon_path, "JPEG")
+
+            # Оновлюємо у БД
+            current_user.image = filename
+
+
+
+        db.session.commit()
+        flash("Your account has been updated!", "success")
+        return redirect(url_for("auth.account"))
+
+    if request.method == "POST" and not form.validate():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field.capitalize()}: {error}", "warning")
+
+    return render_template("auth/update_account.html", form=form)
+
 
 
 @auth_bp.route("/logout", methods=["POST"])

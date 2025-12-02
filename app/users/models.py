@@ -18,5 +18,11 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    image: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True,
+        default='profile_default.jpg'
+    )
+
     def __repr__(self):
         return f"<User id={self.id} username='{self.username}'>"
