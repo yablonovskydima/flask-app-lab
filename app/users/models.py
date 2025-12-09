@@ -13,6 +13,11 @@ class User(db.Model, UserMixin):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(200), nullable=False)
 
+    institutions: Mapped[list["EducationInstitution"]] = relationship(
+        back_populates="author",
+        cascade="all, delete-orphan"
+    )
+
     posts: Mapped[list["Post"]] = relationship(
         back_populates="author",
         cascade="all, delete-orphan"
