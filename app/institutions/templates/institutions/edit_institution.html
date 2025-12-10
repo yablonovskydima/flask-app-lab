@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Edit Education Institution</h2>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('institutions.list_institutions') }}" class="btn btn-warning mb-3">Back</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.name.label }}<br>
+        {{ form.name(class="form-control", value=form.name.data) }}
+    </div>
+
+    <div class="form-group">
+        {{ form.address.label }}<br>
+        {{ form.address(class="form-control", value=form.address.data) }}
+    </div>
+
+    <div class="form-group">
+        {{ form.description.label }}<br>
+        {{ form.description(class="form-control", rows="4") }}{{ form.description.data }}
+    </div>
+
+    <div class="form-group">
+        {{ form.type_id.label }}<br>
+        {{ form.type_id(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+        {{ form.author_id.label }}<br>
+        {{ form.author_id(class="form-control", disabled=True) }}
+    </div>
+
+    <br>
+    <button class="btn btn-primary" type="submit">
+        Update
+    </button>
+</form>
+
+{% endblock %}

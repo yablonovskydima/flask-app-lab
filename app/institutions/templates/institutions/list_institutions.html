@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Education Institutions</h2>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('institutions.list_institution_types') }}" class="btn btn-warning mb-3">List Institution Types</a>
+                    <a href="{{ url_for('institutions.create_institution') }}" class="btn btn-warning mb-3">Create Institution</a>
+                    <a href="{{ url_for('institutions.create_institution_type') }}" class="btn btn-warning mb-3">Create Institution Type</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Institution Name</th>
+            <th>Address</th>
+            <th>Type</th>
+            <th>Author</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for inst in institutions %}
+        <tr>
+            <td>{{ inst.id }}</td>
+            <td>{{ inst.name }}</td>
+            <td>{{ inst.address }}</td>
+            <td>{{ inst.institution_type.type_name }}</td>
+            <td>{{ inst.author.username }}</td>
+
+            <td>
+                {% if current_user.is_authenticated and inst.author_id == current_user.id %}
+                    <a href="{{ url_for('institutions.edit_institution', id=inst.id) }}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="#" class="btn btn-danger btn-sm" 
+                    onclick="if(confirm('Are you sure?')) { document.getElementById('delete-form-{{ inst.id }}').submit(); } return false;">
+                        Delete
+                    </a>
+
+                    <form id="delete-form-{{ inst.id }}" method="POST" action="{{ url_for('institutions.delete_institution', id=inst.id) }}" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    </form>
+
+                {% else %}
+                    <span class="text-muted">No actions</span>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
